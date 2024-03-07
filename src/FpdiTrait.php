@@ -205,12 +205,11 @@ trait FpdiTrait
 				try {
 					$annotation = PdfType::resolve($annotation, $parser);
 
-					$type = PdfName::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'Type'), $parser));
 					$subtype = PdfName::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'Subtype'), $parser));
 					$link = PdfDictionary::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'A'), $parser));
 
 					/* Skip over annotations that aren't links */
-					if ($type->value !== 'Annot' || $subtype->value !== 'Link') {
+					if ($subtype->value !== 'Link') {
 						continue;
 					}
 
