@@ -209,9 +209,9 @@ trait FpdiTrait
 					$link = PdfDictionary::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'A'), $parser));
 
 					/* Skip over annotations that aren't links */
-//					if ($subtype->value !== 'Link') {
-//						continue;
-//					}
+					if ($subtype->value !== 'Link') {
+						continue;
+					}
 
 					/* Calculate the link positioning */
 					$position = PdfArray::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'Rect'), $parser), 4);
@@ -224,6 +224,39 @@ trait FpdiTrait
 						'width' => $rect->getWidth() / Mpdf::SCALE,
 						'height' => $rect->getHeight() / Mpdf::SCALE,
 						'url' => $uri->value
+					];
+				} catch (PdfTypeException $e) {
+					continue;
+				}
+			}
+
+			foreach ($annotations->value as $annotation) {
+				try {
+					$annotation = PdfType::resolve($annotation, $parser);
+
+					$dest = PdfArray::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'Dest'), $parser));
+
+					/* Calculate the link positioning */
+					$position = PdfArray::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'Rect'), $parser), 4);
+					$rect = Rectangle::byPdfArray($position, $parser);
+					//$uri = PdfString::ensure(PdfType::resolve(PdfDictionary::get($link, 'URI'), $parser));
+
+					// cycle through all pages and find the page number
+					for ($i = 1; $i <= $reader->getPageCount(); $i++) {
+						$reader->getPage($i);
+
+
+						if ($reader->getPage($i)->getPageObject()->objectNumber === $dest->value[0]->value) {
+							break;
+						}
+					}
+
+					$links[] = [
+						'x' => $rect->getLlx() / Mpdf::SCALE,
+						'y' => $rect->getLly() / Mpdf::SCALE,
+						'width' => $rect->getWidth() / Mpdf::SCALE,
+						'height' => $rect->getHeight() / Mpdf::SCALE,
+						'url' => '@'.$i
 					];
 				} catch (PdfTypeException $e) {
 					continue;
