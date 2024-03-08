@@ -209,9 +209,9 @@ trait FpdiTrait
 					$link = PdfDictionary::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'A'), $parser));
 
 					/* Skip over annotations that aren't links */
-					if ($subtype->value !== 'Link') {
-						continue;
-					}
+//					if ($subtype->value !== 'Link') {
+//						continue;
+//					}
 
 					/* Calculate the link positioning */
 					$position = PdfArray::ensure(PdfType::resolve(PdfDictionary::get($annotation, 'Rect'), $parser), 4);
